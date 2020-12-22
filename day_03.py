@@ -99,7 +99,7 @@ print(sorted(list(range(0, 11, 3))))
 print(sorted(list(range(2, 11, 3))))
 
 # %%
-with open("input3.txt", "r") as file:
+with open("input03.txt", "r") as file:
     data = file.read()
 
 # %%

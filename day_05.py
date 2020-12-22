@@ -81,7 +81,7 @@ def seat_id(boarding_pass, summary=False):
     seat_id = row * 8 + col
 
     if summary == True:
-        print(f"{boarding_pass}: row {row}, columns {col}, seat ID {seat_id}")
+        print(f"{boarding_pass}: row {row}, column {col}, seat ID {seat_id}")
 
     return seat_id
 
@@ -96,14 +96,14 @@ seat_id(test, summary=True)
 [seat_id(x, summary=True) for x in tests]
 
 # %%
-with open("input5.txt") as f:
+with open("input05.txt") as f:
     part1 = f.read().splitlines()
 
 # %%
 import numpy as np
 
 # %%
-tickets = [seat_id(x, summary=True) for x in part1]
+tickets = [seat_id(x) for x in part1]
 
 # %%
 print(np.max(tickets))

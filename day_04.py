@@ -127,7 +127,7 @@ def valid_passports(input):
 valid_passports(test)
 
 # %%
-with open("input4.txt") as f:
+with open("input04.txt") as f:
     part1 = f.read()
 
 # %%

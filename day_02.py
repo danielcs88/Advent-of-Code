@@ -57,7 +57,7 @@ from io import StringIO
 import pandas as pd
 
 # %%
-with open("input2.txt", "r") as file:
+with open("input02.txt", "r") as file:
     data = file.read()
 
 

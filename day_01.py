@@ -53,7 +53,7 @@ from itertools import combinations
 import numpy as np
 import pandas as pd
 
-nums = list(pd.read_csv("input.txt", header=None, names=["nums"])["nums"])
+nums = list(pd.read_csv("input01.txt", header=None, names=["nums"])["nums"])
 
 # %%
 combs = list(combinations(nums, 2))
