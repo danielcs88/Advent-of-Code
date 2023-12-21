@@ -108,9 +108,11 @@ def valid_passports(input):
 
     prelim2 = [clean(x) for x in prelim]
 
-    insert_quotation = lambda string: string + "'}"
+    def insert_quotation(string):
+        return string + "'}"
 
-    insert_curly = lambda string: "{'" + string
+    def insert_curly(string):
+        return "{'" + string
 
     prelim3 = [insert_quotation(x) for x in prelim2]
 

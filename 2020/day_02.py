@@ -54,10 +54,13 @@ limits of their respective policies.
 # %%
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 
 # %%
-with open("input02.txt", "r") as file:
+# pylint: disable=pointless-string-statement
+
+with open("input02.txt", "r", encoding="utf-8") as file:
     data = file.read()
 
 
@@ -73,7 +76,7 @@ def clean(query):
     return query
 
 
-# %%
+## %%
 df = pd.read_csv(
     # Data is cleaned into a CSV format, transformed into a `String`
     # StringIO makes the "CSV-string" readable to Pandas
@@ -86,31 +89,12 @@ df = pd.read_csv(
 df
 
 # %%
-count = [entry["password"].count(entry["criteria"]) for entry in df.iloc()]
+# count = [entry["password"].count(entry["criteria"]) for entry in df.iloc()]
+is_valid = np.vectorize(
+    lambda min, max, criteria, password: min <= password.count(criteria) <= max
+)
 
-# %%
-test = []
-
-for entry in df.iloc():
-    if (
-        entry["password"].count(entry["criteria"]) <= entry["max"]
-        and entry["password"].count(entry["criteria"]) >= entry["min"]
-    ):
-        test.append(1)
-    else:
-        test.append(0)
-
-# %%
-df["count"] = count
-
-# %%
-df["test"] = test
-
-# %%
-df
-
-# %%
-df["test"].value_counts()
+print(sum(is_valid(df["min"], df["max"], df["criteria"], df["password"])))
 
 # %% [markdown]
 """
@@ -144,40 +128,18 @@ policies?
 """
 
 # %%
-df = pd.read_csv(
-    # Data is cleaned into a CSV format, transformed into a `String`
-    # StringIO makes the "CSV-string" readable to Pandas
-    StringIO(str(clean(data))),
-    header=None,
-    names=["pos_a", "pos_b", "criteria", "password"],
-)
+df.columns = ["pos_a", "pos_b", "criteria", "password"]
+
 
 # %%
-df.head(10)
+def is_valid2(pos_a, pos_b, criteria, password) -> bool:
+    is_lo = password[pos_a - 1] == criteria
+    is_hi = password[pos_b - 1] == criteria
+
+    return is_lo != is_hi
+
+
+is_valid2 = np.vectorize(is_valid2)
 
 # %%
-a_test = []
-b_test = []
-
-for entry in df.iloc():
-    if entry["password"][entry["pos_a"] - 1] == entry["criteria"]:
-        a_test.append(1)
-    else:
-        a_test.append(0)
-    if entry["password"][entry["pos_b"] - 1] == entry["criteria"]:
-        b_test.append(1)
-    else:
-        b_test.append(0)
-
-# %%
-len(b_test)
-
-# %%
-df["a_test"] = a_test
-df["b_test"] = b_test
-
-# %%
-df["final_test"] = df["a_test"] + df["b_test"]
-
-# %%
-df["final_test"].value_counts()
+print(sum(is_valid2(df["pos_a"], df["pos_b"], df["criteria"], df["password"])))

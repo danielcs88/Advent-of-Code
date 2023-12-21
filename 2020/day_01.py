@@ -47,25 +47,23 @@ To begin, [get your puzzle input]([root]/input).
 [root]: https://adventofcode.com/2020/day/1
 """
 
+
 # %%
+import math
 from itertools import combinations
 
-import numpy as np
-import pandas as pd
-
-nums = list(pd.read_csv("input01.txt", header=None, names=["nums"])["nums"])
-
+nums = list(map(int, open("input01.txt", "r", encoding="utf-8").read().split()))
 # %%
 combs = list(combinations(nums, 2))
 
 # %%
-sol = [c for c in combs if sum(c) == 2020]
+sol = [c for c in combs if sum(c) == 2020][0]
 
 # %%
 print(sol)
 
 # %%
-np.prod(sol)
+math.prod(sol)
 
 # %% [markdown]
 """
@@ -87,10 +85,10 @@ In your expense report, _what is the product of the three entries that sum to
 combs = list(combinations(nums, 3))
 
 # %%
-sol = [c for c in combs if sum(c) == 2020]
+sol = [c for c in combs if sum(c) == 2020][0]
 
 # %%
 print(sol)
 
 # %%
-np.prod(sol)
+math.prod(sol)

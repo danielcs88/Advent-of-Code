@@ -80,7 +80,7 @@ def seat_id(boarding_pass, summary=False):
 
     seat_id = row * 8 + col
 
-    if summary == True:
+    if summary is True:
         print(f"{boarding_pass}: row {row}, column {col}, seat ID {seat_id}")
 
     return seat_id

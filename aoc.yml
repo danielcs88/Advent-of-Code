@@ -1,0 +1,20 @@
+name: aoc
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - conda
+  - pip
+  - pandas
+  - ipython
+  - jupyterlab
+  - matplotlib
+  - jupyterlab_code_formatter
+  - nb_conda_kernels
+  - pip:
+      - 'black[jupyter]'
+      - 'advent-of-code-data[nb]'
+      - JLDracula
+      - Pygments
+      - pylint
+      - python-dotenv

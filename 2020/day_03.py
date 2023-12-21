@@ -117,7 +117,8 @@ for _ in range(11):
     test.append(sorted(list(range(0, 31, 3))))
 
 # %%
-flatten = lambda t: [item for sublist in t for item in sublist]
+def flatten(t):
+    return [item for sublist in t for item in sublist]
 
 # %%
 len(test)
@@ -183,7 +184,6 @@ def toboggan_trajectory(forest, x, y):
     """
 
     line_len = list({len(i) for i in forest.splitlines()})[0]
-    limit = line_len - 1
 
     # first_step
     steps = [sorted(list(range(x, line_len, x)))]
@@ -191,9 +191,11 @@ def toboggan_trajectory(forest, x, y):
     # Last item on first step
     first_tail = steps[0][-1]
 
-    tail = lambda x: x[-1]
+    def tail(x):
+        return x[-1]
 
-    algo = lambda tailed: (list(range(tailed + x - line_len, line_len, x)))
+    def algo(tailed):
+        return list(range(tailed + x - line_len, line_len, x))
 
     #     def factorial_recursion(n):
     #         init_vals = []
@@ -208,7 +210,7 @@ def toboggan_trajectory(forest, x, y):
 
     #     test = {algo(first_tail)[0] for algo(first_tail)}
 
-    range_num = int(np.ceil(len(forest.splitlines()) / line_len))
+    int(np.ceil(len(forest.splitlines()) / line_len))
 
     #     for _ in range(range_num):
     #         steps.append(sorted(list(range(2, 31, 3))))
@@ -269,9 +271,11 @@ steps = [sorted(list(range(x, line_len, x)))]
 # Last item on first step
 first_tail = steps[0][-1]
 
-tail = lambda x: x[-1]
+def tail(x):
+    return x[-1]
 
-algo = lambda tailed: list(range(tailed + x - line_len, line_len, x))
+def algo(tailed):
+    return list(range(tailed + x - line_len, line_len, x))
 
 range_num = int(np.ceil(len(forest.splitlines()) / line_len))
 
