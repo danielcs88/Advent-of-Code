@@ -1,5 +1,5 @@
 # %% [markdown]
-# # --- Day 1: Not Quite Lisp ---
+# ## --- Day 1: Not Quite Lisp ---
 #
 # Santa was hoping for a white Christmas, but his weather machine's "snow"
 # function is powered by stars, and he's fresh out! To save Christmas, he needs
@@ -33,3 +33,29 @@
 # To **what floor** do the instructions take Santa?
 
 # %%
+input_01 = aoc_open_input("input_01.txt")
+
+# %%
+print(input_01.count("(") - input_01.count(")"))
+
+# %% [markdown]
+# ## --- Part Two ---
+#
+# Now, given the same instructions, find the **position** of the first character that causes him to enter the basement (floor `-1`). The first character in the instructions has position `1`, the second character has position `2`, and so on.
+#
+# For example:
+#
+# - `)` causes him to enter the basement at character position `1`.
+# - `()())` causes him to enter the basement at character position `5`.
+#
+# What is the **position** of the character that causes Santa to first enter the basement?
+
+# %%
+floor = 0
+
+for step, move in enumerate(input_01, start=1):
+    decision = 1 if move == "(" else -1
+    floor += decision
+    if floor == -1:
+        print(step)
+        break
