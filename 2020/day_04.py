@@ -95,16 +95,11 @@ def valid_passports(input):
 
     prelim = input.split("\n\n")
 
-    def clean(trash):
+    def clean(trash: str) -> str:
         """
         Cleanup entries on list for unwanted characters.
         """
-
-        trash = trash.replace("\n", " ")
-        trash = trash.replace(":", "':'")
-        trash = trash.replace(" ", "', '")
-
-        return trash
+        return trash.replace("\n", " ").replace(":", "':'").replace(" ", "', '")
 
     prelim2 = [clean(x) for x in prelim]
 
@@ -289,7 +284,6 @@ import re
 # Function to validate
 # hexadecimal color code .
 def HexCode(str):
-
     # Regex to check valid
     # hexadecimal color code.
     regex = "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
