@@ -164,8 +164,5 @@ code.txt
 .fleet*
 .virtual_documents
 .virtual_documents*
-.DS_Store
-2015/input*.txt
-2020/input*.txt
-2022/input*.txt
-2023/input*.txt
+*/.DS_Store
+*/input*.txt
