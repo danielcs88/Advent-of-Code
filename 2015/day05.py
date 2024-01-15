@@ -68,7 +68,7 @@ input_strings = [
 count_nice_strings(input_strings)
 
 # %%
-input_05= aoc_open_input("input_05.txt")
+input_05 = aoc_open_input("input_05.txt")
 count_nice_strings(input_05.splitlines())
 
 
@@ -102,8 +102,8 @@ count_nice_strings(input_05.splitlines())
 
 
 # %%
-def is_nice_string_new_rules(s:str) -> bool:
-    def has_pair_repeating(s:str) ->  bool:
+def is_nice_string_new_rules(s: str) -> bool:
+    def has_pair_repeating(s: str) -> bool:
         for i in range(len(s) - 1):
             pair = s[i : i + 2]
             if s.count(pair) >= 2:
