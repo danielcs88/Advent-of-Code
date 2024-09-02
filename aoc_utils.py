@@ -1,5 +1,9 @@
 # from collections import deque
-import itertools
+from typing import Any
+from markdownify import markdownify as md
+import requests
+import numpy as np
+import pyperclip
 
 
 def aoc_open_input(filename: str) -> str:
@@ -19,9 +23,9 @@ def aoc_open_input(filename: str) -> str:
     return open(filename, encoding="utf-8").read()
 
 
-def aoc_adj(
+def aoc_adjacent_coordinates(
     i: int, j: int, include_diagonals: bool = False, only_positive_indices: bool = False
-) -> tuple[int, int]:
+) -> np.ndarray:
     """
     Get adjacent coordinates of a given position, optionally including
     diagonals.
@@ -41,23 +45,29 @@ def aoc_adj(
 
     Returns
     -------
-    tuple
-        A tuple containing adjacent coordinates. If include_diagonals is True,
+    np.ndarray
+        An array containing adjacent coordinates. If include_diagonals is True,
         it includes diagonal coordinates (up, down, left, right, upper-left,
         upper-right, lower-left, lower-right). Otherwise, it includes only up,
         down, left, and right coordinates. If only_positive_indices is True, it
         filters out negative row and column indices.
     """
-
-    result = [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]
+    # Generate coordinates using meshgrid
+    row_offsets = np.array([-1, 1, 0, 0])
+    col_offsets = np.array([0, 0, -1, 1])
 
     if include_diagonals:
-        result += [(i - 1, j - 1), (i - 1, j + 1), (i + 1, j - 1), (i + 1, j + 1)]
+        row_offsets = np.concatenate([row_offsets, [-1, -1, 1, 1]])
+        col_offsets = np.concatenate([col_offsets, [-1, 1, -1, 1]])
+
+    adjacent_coordinates = np.column_stack((i + row_offsets, j + col_offsets))
 
     if only_positive_indices:
-        result = [(row, col) for row, col in result if row >= 0 and col >= 0]
+        # Filter out negative indices
+        positive_indices_mask = (adjacent_coordinates >= 0).all(axis=1)
+        adjacent_coordinates = adjacent_coordinates[positive_indices_mask]
 
-    return result
+    return adjacent_coordinates
 
 
 def aoc_grid(test_string: str) -> dict:
@@ -152,7 +162,6 @@ def aoc_three_dimensional_array(
     ]
 
 
-
 def aoc_grid_dictionary(
     grid_size: int, default_value: int
 ) -> dict[tuple[int, int], int]:
@@ -188,6 +197,36 @@ def aoc_grid_dictionary(
     }
 
 
+def aoc_answer_display(obj):
+    r"""
+    Attempt to display an object using IPython.display, or print if unavailable.
+
+    Parameters
+    ----------
+    obj : any
+        The object to be displayed or printed.
+
+    Returns
+    -------
+    obj
+        Object
+
+    Examples
+    --------
+    >>> try_display("Hello, World!")
+    Hello, World!
+    """
+    try:
+        from IPython.display import display
+        from aoc_utils import aoc_open_input
+
+        pyperclip.copy(obj)
+        # return obj
+    except ImportError:
+        pyperclip.copy(obj)
+        print(obj)
+    return obj
+
 
 def aoc_print_functions(verbose: bool = False):
     """
@@ -212,3 +251,105 @@ def aoc_print_functions(verbose: bool = False):
             print(f"{'-' * 40}")
             print(function.__doc__)
             print("\n" + "=" * 40 + "\n")
+
+
+def aoc_head_dict(d: dict, n: int) -> dict:
+    """
+    Create a new dictionary containing the first `n` items from the input
+    dictionary.
+
+    Parameters
+    ----------
+    d : dict
+        The input dictionary.
+    n : int
+        The number of items to include in the new dictionary.
+
+    Returns
+    -------
+    dict
+        A new dictionary containing the first `n` items from the input
+        dictionary.
+    """
+    return {k: v for i, (k, v) in enumerate(d.items()) if i < n}
+
+
+def aoc_filter_valid_coordinates(
+    arr: np.ndarray, coordinates: np.ndarray
+) -> np.ndarray:
+    """
+    Filters out coordinates that do not exist in array.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        The input array
+    coordinates : np.ndarray
+        The array of coordinates of `arr`
+
+    Returns
+    -------
+    np.ndarray
+        Filtered out array with valid coordinates
+    """
+    max_row, max_col = arr.shape
+
+    # Create boolean masks for valid rows and columns
+    valid_rows = (coordinates[:, 0] >= 0) & (coordinates[:, 0] < max_row)
+    valid_cols = (coordinates[:, 1] >= 0) & (coordinates[:, 1] < max_col)
+
+    # Combine the boolean masks to get the final valid coordinates
+    valid_coordinates_mask = valid_rows & valid_cols
+
+    # Use boolean indexing to filter out invalid coordinates
+    valid_coordinates = coordinates[valid_coordinates_mask]
+
+    return valid_coordinates
+
+
+def aoc_transpose_list_of_lists(input_list: list[list[Any]]) -> list[list[Any]]:
+    """
+    Transposes a list of lists (matrix) such that the rows become columns and vice versa.
+
+    Parameters
+    ----------
+    input_list : list[list[Any]]
+        A list of lists representing a matrix, where each inner list is a row.
+
+    Returns
+    -------
+    list[list[Any]]
+        A new list of lists where the rows of the input are converted into columns.
+        The ith row in the output corresponds to the ith column in the input.
+
+    Examples
+    --------
+    >>> input_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    >>> aoc_transpose_list_of_lists(input_list)
+    [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+    """
+    return list(map(lambda *x: list(x), *(input_list)))
+
+
+def aoc_retrive_question_text() -> None:
+    url = pyperclip.paste()
+    text = (
+        md(requests.get(url).text)
+        .replace("\n* ", "\n- ")
+        .replace("\-\-\-", "---")
+        .replace("*", "**")
+        .replace("\n\n", "\n")
+    )
+    start = text.find("---")
+    end = text.find("To play,")
+
+    final_draft = text[start:end].replace("--- Day", "## --- Day").splitlines()
+
+    lines_to_delete = {1: "", -1: ""}
+
+    for k, v in lines_to_delete.items():
+        final_draft[k] = v
+
+    final_text = "\n".join(final_draft)
+
+    pyperclip.copy(final_text)

@@ -46,18 +46,18 @@
 # **total score** of the highest-scoring cookie you can make?
 
 # %%
+from itertools import permutations
+import pandas as pd
+import numpy as np
+import re
+
 test = """Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
 Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3"""
 
 INPUT_15 = aoc_open_input("input_15.txt")
 
+
 # %%
-import re
-
-import numpy as np
-import pandas as pd
-
-
 def ingredient_stats(input_str: str, verbose: bool = True):
     regex = re.compile(
         r"(\w+): capacity (-?\d), durability (-?\d), flavor (-?\d), texture (-?\d), calories (-?\d)"
@@ -77,9 +77,6 @@ def ingredient_stats(input_str: str, verbose: bool = True):
 
 
 # %%
-from itertools import permutations
-
-
 def find_permutations(numbers, target_sum: int, factors: int):
     return np.fromiter(
         (comb for comb in permutations(numbers, factors) if sum(comb) == target_sum),
@@ -113,7 +110,7 @@ def part_one(input_str: str, verbose: bool = False) -> int:
 
 
 # %%
-aoc_answer_display(part_one(test))
+aoc_answer_display(int(part_one(test)))
 part_one(test, True)
 
 # %%
@@ -138,6 +135,7 @@ part_one(INPUT_15, True)
 # Given the ingredients in your kitchen and their properties, what is the *total
 # score* of the highest-scoring cookie you can make with a calorie total of
 # `500`?
+
 
 # %%
 def max_total_score_with_calorie_restriction(

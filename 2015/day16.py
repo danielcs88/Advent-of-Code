@@ -51,6 +51,9 @@
 # What is the **number** of the Sue that got you the gift?
 
 # %%
+import re
+
+# %%
 ticker_tape = {
     "children": 3,
     "cats": 7,
@@ -65,3 +68,63 @@ ticker_tape = {
 }
 
 INPUT_16 = aoc_open_input("input_16.txt")
+
+
+# %%
+def generate_sue_dict(input_str: str) -> dict[int, dict[str, int]]:
+    REGEX = re.compile(r"Sue (\d+): (\w+): (\d+), (\w+): (\d+), (\w+): (\d+)")
+    SUES = {}
+    for line in re.findall(REGEX, INPUT_16):
+        chars = line[1::2]
+        counts = map(int, line[2::2])
+
+        SUES[int(line[0])] = dict(zip(chars, counts))
+    return SUES
+
+
+# %%
+def part_one(sue_dict: dict[int, dict[str, int]]) -> int:
+    return int(pd.DataFrame(sue_dict).T.eq(pd.Series(ticker_tape)).sum(axis=1).idxmax())
+
+
+# %%
+aoc_answer_display(part_one(generate_sue_dict(INPUT_16)))
+
+
+# %% [markdown]
+# ## --- Part Two ---
+#
+# As you're about to send the thank you note, something in the MFCSAM's
+# instructions catches your eye. Apparently, it has an outdated
+# [retroencabulator](https://www.youtube.com/watch?v=RXJKdh1KZ0w), and so the
+# output from the machine isn't exact values - some of them indicate ranges.
+#
+# In particular, the `cats` and `trees` readings indicates that there are
+# **greater than** that many (due to the unpredictable nuclear decay of cat
+# dander and tree pollen), while the `pomeranians` and `goldfish` readings
+# indicate that there are **fewer than** that many (due to the modial
+# interaction of magnetoreluctance).
+#
+# What is the **number** of the real Aunt Sue?
+
+
+# %%
+def part_two(sue_dict: dict[int, dict[str, int]]) -> int:
+    greater_than = ["cats", "trees"]
+    less_than = ["pomeranians", "goldfish"]
+    without_range_cols = list(ticker_tape.keys() - (greater_than + less_than))
+    sue_df = pd.DataFrame(sue_dict)
+    ticker_series = pd.Series(ticker_tape)
+    return int(
+        (
+            sue_df.loc[without_range_cols]
+            .T.eq(ticker_series.loc[without_range_cols])
+            .sum(axis=1)
+            + sue_df.loc[greater_than].T.gt(ticker_series.loc[greater_than]).sum(axis=1)
+            + sue_df.loc[less_than].T.lt(ticker_series.loc[less_than]).sum(axis=1)
+        ).idxmax()
+    )
+
+
+# %%
+aoc_answer_display(part_two(generate_sue_dict(INPUT_16)))
