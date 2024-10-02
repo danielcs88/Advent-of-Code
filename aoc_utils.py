@@ -9,18 +9,28 @@ import pyperclip
 def aoc_open_input(filename: str) -> str:
     """
     Opens and reads the contents of a file.
-
     Parameters
     ----------
     filename : str
         The name of the file to be opened.
-
     Returns
     -------
     str
         The contents of the file as a string.
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist.
+    PermissionError
+        If the user doesn't have permission to read the file.
+    IOError
+        For other I/O related errors.
     """
-    return open(filename, encoding="utf-8").read()
+    try:
+        with open(filename, encoding="utf-8") as file:
+            return file.read()
+    except (FileNotFoundError, PermissionError, IOError) as e:
+        raise e
 
 
 def aoc_adjacent_coordinates(
@@ -336,7 +346,7 @@ def aoc_retrive_question_text() -> None:
     text = (
         md(requests.get(url).text)
         .replace("\n* ", "\n- ")
-        .replace("\-\-\-", "---")
+        .replace(r"\-\-\-", "---")
         .replace("*", "**")
         .replace("\n\n", "\n")
     )
@@ -353,3 +363,7 @@ def aoc_retrive_question_text() -> None:
     final_text = "\n".join(final_draft)
 
     pyperclip.copy(final_text)
+
+
+def aoc_part_two_text() -> None:
+    pyperclip.copy(pyperclip.paste().replace("*", "**"))

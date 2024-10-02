@@ -38,7 +38,7 @@
 # %%
 examples = ("R2, L3", "R2, R2, R2", "R5, L5, R5, R3")
 
-input_01 = aoc_open_input("input01.txt")
+input_01 = aoc_open_input("input_01.txt")
 # aoc_answer_display(part_one(input_01))
 
 
