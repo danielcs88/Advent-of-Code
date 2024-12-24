@@ -1,35 +1,49 @@
 import numpy as np
 import pyperclip
+from functools import wraps
+from typing import Any, Callable
 
 
-def aoc_answer_display(obj):
-    r"""
-    Attempt to display an object using IPython.display, or print if unavailable.
+def aoc_answer_display(func: Callable[..., Any]) -> Callable[..., Any]:
+    """
+    A decorator that displays the return value of a function using IPython.display if available,
+    falls back to print if not. Also copies the result to clipboard.
 
     Parameters
     ----------
-    obj : any
-        The object to be displayed or printed.
+    func : Callable
+        The function whose return value should be displayed
 
     Returns
     -------
-    obj
-        Object
+    Callable
+        Wrapped function that displays and returns its result
 
     Examples
     --------
-    >>> try_display("Hello, World!")
-    Hello, World!
+    >>> @aoc_answer_display
+    ... def solve_day_1(input_data):
+    ...     return "Answer: 42"
+    >>> result = solve_day_1("some input")
+    Answer: 42
     """
-    try:
-        from IPython.display import display
 
-        pyperclip.copy(obj)
-        # return obj
-    except ImportError:
-        pyperclip.copy(obj)
-        print(obj)
-    return obj
+    @wraps(func)
+    def wrapper(*args, **kwargs) -> Any:
+        result = func(*args, **kwargs)
+
+        try:
+            from IPython.display import display
+
+            pyperclip.copy(str(result))
+            display(result)
+        except ImportError:
+            pyperclip.copy(str(result))
+            print(result)
+
+        return result
+
+    return wrapper
 
 
 def aoc_filter_valid_coordinates(

@@ -1,5 +1,7 @@
 # from collections import deque
-from typing import Any
+from functools import wraps
+from itertools import product
+from typing import Any, Callable
 from markdownify import markdownify as md
 import requests
 import numpy as np
@@ -202,40 +204,50 @@ def aoc_grid_dictionary(
     }
     """
     return {
-        (x, y): default_value
-        for x, y in itertools.product(range(grid_size), range(grid_size))
+        (x, y): default_value for x, y in product(range(grid_size), range(grid_size))
     }
 
 
-def aoc_answer_display(obj):
-    r"""
-    Attempt to display an object using IPython.display, or print if unavailable.
+def aoc_answer_display(func: Callable[..., Any]) -> Callable[..., Any]:
+    """
+    A decorator that displays the return value of a function using IPython.display if available,
+    falls back to print if not. Also copies the result to clipboard.
 
     Parameters
     ----------
-    obj : any
-        The object to be displayed or printed.
+    func : Callable
+        The function whose return value should be displayed
 
     Returns
     -------
-    obj
-        Object
+    Callable
+        Wrapped function that displays and returns its result
 
     Examples
     --------
-    >>> try_display("Hello, World!")
-    Hello, World!
+    >>> @aoc_answer_display
+    ... def solve_day_1(input_data):
+    ...     return "Answer: 42"
+    >>> result = solve_day_1("some input")
+    Answer: 42
     """
-    try:
-        from IPython.display import display
-        from aoc_utils import aoc_open_input
 
-        pyperclip.copy(obj)
-        # return obj
-    except ImportError:
-        pyperclip.copy(obj)
-        print(obj)
-    return obj
+    @wraps(func)
+    def wrapper(*args, **kwargs) -> Any:
+        result = func(*args, **kwargs)
+
+        try:
+            from IPython.display import display
+
+            pyperclip.copy(str(result))
+            display(result)
+        except ImportError:
+            pyperclip.copy(str(result))
+            print(result)
+
+        return result
+
+    return wrapper
 
 
 def aoc_print_functions(verbose: bool = False):
@@ -317,7 +329,7 @@ def aoc_filter_valid_coordinates(
     return valid_coordinates
 
 
-def aoc_transpose_list_of_lists(input_list: list[list[Any]]) -> list[list[Any]]:
+def aoc_transpose_list_of_lists(input_list: list[list[Any]]) -> None:
     """
     Transposes a list of lists (matrix) such that the rows become columns and vice versa.
 
@@ -360,10 +372,41 @@ def aoc_retrive_question_text() -> None:
     for k, v in lines_to_delete.items():
         final_draft[k] = v
 
-    final_text = "\n".join(final_draft)
+    final_text = "\n\n".join(final_draft)
 
     pyperclip.copy(final_text)
 
 
 def aoc_part_two_text() -> None:
     pyperclip.copy(pyperclip.paste().replace("*", "**"))
+
+
+def aoc_retrieve_diagonals(input_grid: str) -> str:
+    grid = input_grid.splitlines()
+    rows = len(grid)
+    cols = len(grid[0])
+
+    assert rows == cols, "Input Grid is not nxn"
+
+    diagonals = []
+
+    # Down-right diagonals
+    for d in range(rows + cols - 1):
+        diagonal = [
+            grid[i][d - i] for i in range(max(d - cols + 1, 0), min(d + 1, rows))
+        ]
+        diagonals.append("".join(diagonal))
+
+    # Up-right diagonals
+    for d in range(rows + cols - 1):
+        diagonal = [
+            grid[rows - i - 1][d - i]
+            for i in range(max(d - cols + 1, 0), min(d + 1, rows))
+        ]
+        diagonals.append("".join(diagonal))
+
+    return "\n".join(diagonals)
+
+
+def aoc_transpose_block_text(input_grid: str) -> str:
+    return "\n".join("".join(i) for i in zip(*input_grid.split()))
